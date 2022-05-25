@@ -26,6 +26,7 @@ class ChurnDataFeatureStore:
         
         return params
 
+    # generate data for customers who are eligible to churn
     def _get_data(self, params):
 
         query = """ 
@@ -95,6 +96,7 @@ class ChurnDataFeatureStore:
         return return_code
 
 
+    #generate labels for the customers above
     def _get_labels(self, params):
 
         query = """ 
@@ -133,6 +135,7 @@ class ChurnDataFeatureStore:
 
         return return_code
 
+    #final table to serve
     def _get_snapshot(self, params):
 
         query = """ 
