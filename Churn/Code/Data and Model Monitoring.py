@@ -39,6 +39,8 @@ class Monitoring:
             'base_snapshot':self.base_snapshot_date.replace('-','_')[:7]
         }
     
+    #generate statistics between two distributions  
+    
     def drift(self, col, base, curr):
         
         _,p_ttest = stats.ttest_ind(base, curr, equal_var = False)
@@ -63,7 +65,7 @@ class Monitoring:
         return p_ttest, p_ks_samp, jensenshannon_dist, dist_em, std
         
         
-        
+    #iterate over all features    
     
     def feature_drift(self, params, required_feats):
         
@@ -107,7 +109,9 @@ class Monitoring:
         df['std'] = stds
         
         return 0,df
-        
+       
+    # drift statistics for predictions
+    
     def prediction_drift(self, params):
         
         t_test = []
@@ -148,6 +152,8 @@ class Monitoring:
         df['std'] = stds
         
         return 0, df
+    
+    #generate model performance and business metrics for each decile/percentile
     
     def _get_KS_metrics(self, params, windows):
         print("KS_global_metrics")
@@ -202,6 +208,8 @@ class Monitoring:
         data['KS'] = (data['Events_Cumm'] - data['NonEvents_Cumm'])*100
         return data
     
+    #generate AUC scores
+    
     def _get_AUC_metrics(self, params):
         
         spark = get_spark_session()
@@ -226,42 +234,18 @@ class Monitoring:
         df['snapshot'] = params['snapshot']
         
         return df
+     
+    #1 if drifting, 0 if test passes
+    def _compare_drift_stats(self, params):
+        pass
     
+    #1 if drifting, 0 if test passes
     def _compare_KS(self, params):
         pass
     
+    #1 if drifting, 0 if test passes
     def _compare_AUC(self, params):
         pass
-    
-    def _generate_AUCs(self, )
-    
-    def data_wrapper(self):
-        
-        return_dict = {
-            'return_code':'',
-            'return_msg':'',
-        }
-        
-        params = self.get_params()
-        
-        return_code = self._get_data(params)
-        if(return_code != 0):
-            return_dict['return_code'] = return_code
-            return_dict['return_msg'] = "Failed _get_data"
-            return return_dict
-        
-        return_code = self._get_labels(params)
-        if(return_code != 0):
-            return_dict['return_code'] = return_code
-            return_dict['return_msg'] = "Failed _get_labels"
-            return return_dict
-        
-        return_code = self._get_snapshot(params)
-        if(return_code != 0):
-            return_dict['return_code'] = return_code
-            return_dict['return_msg'] = "Failed _get_snapshot"
-        
-        return return_dict
     
     def wrapper(self):
         pass
