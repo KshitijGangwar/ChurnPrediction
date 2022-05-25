@@ -15,12 +15,13 @@ from pyspark.sql.functions import isnan, when, count, col
 from scipy.stats import wasserstein_distance
 
 
+#LabelEncoding
 def object_to_int(dataframe_series):
     if dataframe_series.dtype=='object':
         dataframe_series = LabelEncoder().fit_transform(dataframe_series)
     return dataframe_series
 
-
+#Generate ROC curve
 def roc_curve_show(y_test, y_pred_prob, model_name):
     fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
     plt.plot([0, 1], [0, 1], 'k--' )
@@ -30,15 +31,16 @@ def roc_curve_show(y_test, y_pred_prob, model_name):
     plt.title(model_name + 'ROC Curve',fontsize=16)
     plt.show()
     
+#Generate PR curve
 def pr_curve_show(y_test, y_pred_prob, model_name):
     p, r, thresholds = precision_recall_curve(y_test, y_pred_prob)
-    #plt.plot([0, 1], [0, 1], 'k--' )
     plt.plot(p, r, label=model_name,color = "r")
     plt.xlabel('Precision')
     plt.ylabel('Recall')
     plt.title(model_name + 'PR Curve',fontsize=16)
     plt.show()
-    
+
+#helper function for KS
 def calculate_cumm_dist(a):
     l = []
     for i in range(len(a)):
@@ -50,6 +52,7 @@ def calculate_cumm_dist(a):
 
     return l
 
+#get spark configuration
 def spark_context_file(SparkConf,Appname,type_conf="M",queue='user.H20.aig_scaled'):
     if type_conf=="S":
         conf= SparkConf().setAppName(Appname).set("spark.sql.shuffle.partitions",1000).        set("spark.executor.instances","15").set("spark.executor.cores","3").set('spark.yarn.queue',queue)
@@ -77,7 +80,7 @@ def spark_context_file(SparkConf,Appname,type_conf="M",queue='user.H20.aig_scale
         raise ValueError("No Pyspark configuration")
     return conf
 
-
+#get sparkSQL object
 def get_sqlContext(spark_queue = 'user.H20.aig_scaled'):
     
     appname="Churn_Monitoring"
@@ -94,12 +97,14 @@ def get_sqlContext(spark_queue = 'user.H20.aig_scaled'):
     
     return sqlContext
 
+#create spark session
 def get_spark_session():
     spark_config = [("spark.driver.memory","5g"),                ("spark.executor.memory","15g"),                ("spark.executor.cores","5"),                ("spark.yarn.queue","root.user.H20.default")] 
     spark = SparkSession.builder.appName("Python Spark SQL Hive integration example 1").master("yarn")        .config(conf=SparkConf().setAll(spark_config)).enableHiveSupport().getOrCreate()
     
     return spark
 
+#SQL wrapper
 def run_query(sqlContext, query):
     
     for q in query.split(';'):
