@@ -58,10 +58,6 @@ class Monitoring:
         dist_em = wasserstein_distance(base,curr)
         std = np.min([np.std(base),np.std(curr)])
         
-        ks_test_2 = pd.DataFrame(krushall_jul_oct_2,columns = ['features', 'kolmogorov_p_value'])
-        js_div_2 = pd.DataFrame(jensenshannon_div_2,columns = ['features', 'js_divergence']).sort_values('js_divergence',ascending = False)
-        wasserstein_dist_2 = pd.DataFrame(em_dist_2,columns = ['features', 'wasserstein_distance','std']).sort_values('wasserstein_distance',ascending = False)
-
         return p_ttest, p_ks_samp, jensenshannon_dist, dist_em, std
         
         
