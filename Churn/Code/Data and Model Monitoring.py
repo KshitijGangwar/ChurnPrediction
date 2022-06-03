@@ -71,24 +71,23 @@ class Monitoring:
         em_test_2 = []
         stds = []
         
+        base_data_query = """select * from {db}.{user}_churn_data_{base_snapshot}""".format(**params)
+        (return_code, base_data) = run_query(self.spark_df, base_data_query)
+
+        if(return_code !=0):
+            return return_code, None
+
+        curr_data_query = """select * from {db}.{user}_churn_data_{curr_snapshot}""".format(**params)
+        (return_code, curr_data) = run_query(self.spark_df, curr_data_query)
+
+        if(return_code !=0):
+            return return_code, None
+
         for feat in required_feats:
-            
-            base_data_query = """select * from {db}.{user}_churn_data_{base_snapshot}""".format(**params)
-            (return_code, base_data) = run_query(self.spark_df, base_data_query)
-
-            if(return_code !=0):
-                return return_code, None
-
-            curr_data_query = """select * from {db}.{user}_churn_data_{curr_snapshot}""".format(**params)
-            (return_code, curr_data) = run_query(self.spark_df, curr_data_query)
-
-            if(return_code !=0):
-                return return_code, None
-            
             
             base = np.nan_to_num(np.array(base_data.select(feat).rdd.flatMap(lambda x: x).collect()).astype(float),nan = 0)
             curr = np.nan_to_num(np.array(curr_data.select(feat).rdd.flatMap(lambda x: x).collect()).astype(float),nan = 0)
-            p_ttest, p_ks_samp, jensenshannon_dist, dist_em, std = self.drift(col, base, curr)
+            p_ttest, p_ks_samp, jensenshannon_dist, dist_em, std = self.drift(feat, base, curr)
             
             t_test.append(p_ttest)
             ks_test.append(p_ks_samp)
